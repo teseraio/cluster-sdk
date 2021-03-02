@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package proto;
+
+option go_package = "/cluster/proto";
+
+import "google/protobuf/empty.proto";
+
+service SystemService {
+    rpc Stream(stream StreamObj) returns (stream StreamObj);
+    rpc IsLeader(google.protobuf.Empty) returns (IsLeaderResp);
+}
+
+message IsLeaderResp {
+    bool isLeader = 1;
+}
+
+message StreamObj {
+    oneof event {
+        Start start = 1;
+        Open  open = 2;
+        Input input = 3;
+    }
+
+    message Start {
+        Channel channel = 1;
+
+        enum Channel {
+            UNKNOWN = 0;
+            SERF    = 1;
+            RAFT    = 2;
+        }
+    }
+
+    message Open {}
+
+    message Input {
+        bytes data = 1;
+    }
+}
